@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"errors"
+	"strings"
+)
 
 func main() {}
 
@@ -8,23 +11,32 @@ func simulateGame(h1 []int, h2 []int) int {
 	deckSize := len(h1) + len(h2)
 	discard := []int{}
 	isH1Turn := true
+	turns := 0
+	var err error
 	for len(h1) < deckSize || len(h2) < deckSize {
+		turns++
 		if isH1Turn {
-			if len(h1) == 0 {
-				return 1
+			h1, discard, err = placeCard(h1, discard)
+			if err != nil {
+				return turns
 			}
-			h1, discard = placeCard(h1, discard)
 			if discard[len(discard)-1] > 0 {
-				h1, h2, discard = playTrick(h1, h2, discard)
+				h1, h2, discard, err = playTrick(h1, h2, discard)
+				if err != nil {
+					return turns
+				}
 			}
 			isH1Turn = false
 		} else {
-			if len(h2) == 0 {
-				return 2
+			h2, discard, err = placeCard(h2, discard)
+			if err != nil {
+				return turns
 			}
-			h2, discard = placeCard(h2, discard)
 			if discard[len(discard)-1] > 0 {
-				h2, h1, discard = playTrick(h2, h1, discard)
+				h2, h1, discard, err = playTrick(h2, h1, discard)
+				if err != nil {
+					return turns
+				}
 			}
 			isH1Turn = true
 		}
@@ -32,17 +44,24 @@ func simulateGame(h1 []int, h2 []int) int {
 	return 0
 }
 
-func playTrick(initiator []int, player []int, discard []int) ([]int, []int, []int) {
+func playTrick(initiator []int, player []int, discard []int) ([]int, []int, []int, error) {
+	var err error
 	turns := discard[len(discard)-1] // top card
 	for i := 0; i < turns; i++ {
-		player, discard = placeCard(player, discard)
+		player, discard, err = placeCard(player, discard)
+		if err != nil {
+			return initiator, player, discard, errors.New("player lost")
+		}
 		if discard[len(discard)-1] > 0 {
-			player, initiator, discard = playTrick(player, initiator, discard)
-			return initiator, player, discard
+			player, initiator, discard, err = playTrick(player, initiator, discard)
+			if err != nil {
+				return initiator, player, discard, errors.New("player lost")
+			}
+			return initiator, player, discard, nil
 		}
 	}
 	initiator, discard = giveWinnerCards(initiator, discard)
-	return initiator, player, discard
+	return initiator, player, discard, nil
 }
 
 func giveWinnerCards(initiator []int, discard []int) ([]int, []int) {
@@ -51,10 +70,13 @@ func giveWinnerCards(initiator []int, discard []int) ([]int, []int) {
 
 // Hand[0] = top
 // Discard[0] = bottom
-func placeCard(hand []int, discard []int) ([]int, []int) {
+func placeCard(hand []int, discard []int) ([]int, []int, error) {
+	if len(hand) == 0 {
+		return hand, discard, errors.New("hand lost")
+	}
 	card, hand := hand[0], hand[1:]
 	discard = append(discard, card)
-	return hand, discard
+	return hand, discard, nil
 }
 
 func convertStringIntoGameArray(x string) []int {
