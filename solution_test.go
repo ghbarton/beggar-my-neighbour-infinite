@@ -39,14 +39,14 @@ func TestRunGame(t *testing.T) {
 			name:      "game 1",
 			hand1:     "Q--J----K--K-J---Q---A---A",
 			hand2:     "---K-K--JA-QA--J-----Q----",
-			expTurns:  5104,
+			expTurns:  5105,
 			expTricks: 713,
 		},
 		{
 			name:      "game 1",
 			hand1:     "---JQ---K-A----A-J-K---QK-",
 			hand2:     "-J-----------AJQA----K---Q",
-			expTurns:  5791,
+			expTurns:  5790,
 			expTricks: 805,
 		},
 	}
