@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -42,6 +43,56 @@ func simulateGame(h1 []int, h2 []int) int {
 		}
 	}
 	return 0
+}
+func runGame(h1 []int, h2 []int) (int, int) {
+	//deckSize := len(h1) + len(h2)
+	discard := []int{}
+	isH1Turn := true
+	turns := 0
+	tricks := 0
+	var err error
+	for len(h1) > 0 || len(h2) > 0 {
+		cardsToPlay := 1
+		battle := false
+		for cardsToPlay > 0 {
+			if isH1Turn {
+				h1, discard, err = placeCard(h1, discard)
+				if err != nil {
+					return turns, tricks
+					//break
+				}
+			} else {
+				h2, discard, err = placeCard(h2, discard)
+				if err != nil {
+					return turns, tricks
+					//break
+				}
+			}
+			turns++
+			if discard[len(discard)-1] == 0 {
+				if battle {
+					cardsToPlay--
+				} else {
+					isH1Turn = !isH1Turn
+				}
+			} else {
+				battle = true
+				cardsToPlay = discard[len(discard)-1]
+				isH1Turn = !isH1Turn
+			}
+		}
+		tricks++
+		battle = false
+		if isH1Turn {
+			h2, discard = giveWinnerCards(h2, discard)
+		} else {
+			h1, discard = giveWinnerCards(h1, discard)
+		}
+
+		fmt.Printf("%v%v%v\n", h1, h2, discard)
+		isH1Turn = !isH1Turn
+	}
+	return turns, tricks
 }
 
 func playTrick(initiator []int, player []int, discard []int) ([]int, []int, []int, error) {
