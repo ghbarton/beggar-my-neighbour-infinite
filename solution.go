@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 )
 
@@ -58,12 +57,14 @@ func runGame(h1 []int, h2 []int) (int, int) {
 			if isH1Turn {
 				h1, discard, err = placeCard(h1, discard)
 				if err != nil {
+					tricks++
 					return turns, tricks
 					//break
 				}
 			} else {
 				h2, discard, err = placeCard(h2, discard)
 				if err != nil {
+					tricks++
 					return turns, tricks
 					//break
 				}
@@ -89,7 +90,7 @@ func runGame(h1 []int, h2 []int) (int, int) {
 			h1, discard = giveWinnerCards(h1, discard)
 		}
 
-		fmt.Printf("%v%v%v\n", h1, h2, discard)
+		//fmt.Printf("%v/%v/%v\n", convertGameArrayIntoString(h1), convertGameArrayIntoString(h2), "")
 		isH1Turn = !isH1Turn
 	}
 	return turns, tricks
@@ -148,4 +149,23 @@ func convertStringIntoGameArray(x string) []int {
 		}
 	}
 	return result
+}
+
+func convertGameArrayIntoString(arr []int) string {
+	result := make([]string, len(arr))
+	for i, val := range arr {
+		switch val {
+		case 4:
+			result[i] = "A"
+		case 3:
+			result[i] = "K"
+		case 2:
+			result[i] = "Q"
+		case 1:
+			result[i] = "J"
+		default:
+			result[i] = "-"
+		}
+	}
+	return strings.Join(result, "")
 }
