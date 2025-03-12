@@ -27,6 +27,38 @@ func TestSimulateGame(t *testing.T) {
 	}
 }
 
+func TestRunGame(t *testing.T) {
+	testCases := []struct {
+		name      string
+		hand1     string
+		hand2     string
+		expTurns  int
+		expTricks int
+	}{
+		{
+			name:      "game 1",
+			hand1:     "Q--J----K--K-J---Q---A---A",
+			hand2:     "---K-K--JA-QA--J-----Q----",
+			expTurns:  5104,
+			expTricks: 713,
+		},
+		{
+			name:      "game 1",
+			hand1:     "---JQ---K-A----A-J-K---QK-",
+			hand2:     "-J-----------AJQA----K---Q",
+			expTurns:  5791,
+			expTricks: 805,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			auditTurns, auditTricks := runGame(convertStringIntoGameArray(tc.hand1), convertStringIntoGameArray(tc.hand2))
+			assert.Equal(t, tc.expTurns, auditTurns)
+			assert.Equal(t, tc.expTricks, auditTricks)
+		})
+	}
+}
+
 func TestValueMapping(t *testing.T) {
 	testCases := []struct {
 		name string
