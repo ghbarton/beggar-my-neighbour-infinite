@@ -1,3 +1,10 @@
+# Info
+
+The card game Beggar My Neighbour is deterministic, this program allows you to run any game.
+
+# Execution
+
+
 To test the solution run `go test solution` in the cli
 
 # Common error:
